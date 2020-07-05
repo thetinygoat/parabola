@@ -16,6 +16,22 @@
 package main
 
 const (
-	noExist = "nil"
-	ok      = "ok"
+	noExist    = "nil"
+	ok         = "ok"
+	configFile = "memdb.conf"
 )
+
+// Port is the port memdb runs on
+var Port string
+
+// Password is the memdb password
+var Password string
+
+// EvictionPolicy is the cache eviction policy
+var EvictionPolicy string
+
+// OperationMode specifies mode of operation ie clustereor normal
+var OperationMode string
+
+// MaxMemory is the max memory available to memdb
+var MaxMemory int
