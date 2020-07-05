@@ -18,23 +18,8 @@ package main
 import "fmt"
 
 func main() {
-	lru := NewLru(12)
-	val := lru.Get("sachin")
-	fmt.Println(val)
-	fmt.Println(lru.size)
-	lru.Set("sachin", "saini")
-	val = lru.Get("sachin")
-	fmt.Println(val)
-	fmt.Println(lru.size)
-	lru.Set("peeyush", "pessss")
-	val = lru.Get("peeyush")
-	fmt.Println(val)
-	fmt.Println(lru.size)
-	lru.Set("vrinda", "ves")
-	val = lru.Get("vrinda")
-	fmt.Println(val)
-	fmt.Println(lru.size)
-	val = lru.Get("sachin")
-	fmt.Println(val)
-	fmt.Println(lru.cache.Len())
+	bloom := NewBloomFilter(20000, 5)
+	fmt.Println(bloom.Get("sachin"))
+	bloom.Add("sachin")
+	fmt.Println(bloom.Get("sachi"))
 }
