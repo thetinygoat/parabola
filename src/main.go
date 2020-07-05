@@ -16,6 +16,7 @@
 package main
 
 func main() {
+	ReadConfig()
 	conn := NewConnection("8080")
 	conn.StartConnection()
 }
