@@ -36,4 +36,5 @@ func main() {
 	fmt.Println(lru.size)
 	val = lru.Get("sachin")
 	fmt.Println(val)
+	fmt.Println(lru.cache.Len())
 }

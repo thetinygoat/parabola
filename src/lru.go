@@ -24,6 +24,7 @@ import (
 const (
 	noExist = "nil"
 	ok      = "ok"
+	maxKeys = 1000000 // max keys lru can hold
 )
 
 // Lru implements lru caching
@@ -36,7 +37,7 @@ type Lru struct {
 // NewLru instantiates new Lru cache
 func NewLru(capacity int) *Lru {
 	l := Lru{}
-	l.cache, _ = lru.New(capacity)
+	l.cache, _ = lru.New(maxKeys)
 	l.capacity = capacity
 	l.size = 0
 	return &l
@@ -73,7 +74,9 @@ func (l *Lru) Remove(key string) string {
 	if ok := l.cache.Contains(key); !ok {
 		return noExist
 	}
+	value := l.Get(key)
 	l.cache.Remove(key)
+	l.size -= len(value)
 	return ok
 }
 
