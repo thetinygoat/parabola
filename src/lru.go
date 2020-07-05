@@ -22,8 +22,6 @@ import (
 )
 
 const (
-	noExist = "nil"
-	ok      = "ok"
 	maxKeys = 1000000 // max keys lru can hold
 )
 
