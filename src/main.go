@@ -15,11 +15,7 @@
 
 package main
 
-import "fmt"
-
 func main() {
-	bloom := NewBloomFilter(20000, 5)
-	fmt.Println(bloom.Get("sachin"))
-	bloom.Add("sachin")
-	fmt.Println(bloom.Get("sachi"))
+	conn := NewConnection("8080")
+	conn.StartConnection()
 }
