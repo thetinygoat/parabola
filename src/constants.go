@@ -21,6 +21,25 @@ const (
 	configFile = "memdb.conf"
 )
 
+// Lru constants
+const (
+	LruMaxKeys       = 1000000 // max keys lru can hold
+	LruInternalError = "LruInternalError"
+	LruNoKeyError    = "lruNoKeyError"
+)
+
+// List constants
+const (
+	ListNokeyError    = "ListNokeyError"
+	ListInternalError = "ListInternalError"
+)
+
+// HMap constants
+const (
+	HMapNoKeyError    = "HMapNoKeyError"
+	HMapInternalError = "HMapInternalError"
+)
+
 // Port is the port memdb runs on
 var Port string
 
