@@ -16,7 +16,7 @@
 package main
 
 import (
-	"fmt"
+	"errors"
 	"sync"
 
 	dll "github.com/emirpasic/gods/lists/doublylinkedlist"
@@ -37,57 +37,57 @@ func NewList() *List {
 }
 
 // LPush adds items to the left of the list
-func (l *List) LPush(data string) string {
+func (l *List) LPush(data interface{}) error {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 	l.list.Append(data)
-	return ok
+	return nil
 }
 
 // RPush adds items to the right of the list
-func (l *List) RPush(data string) string {
+func (l *List) RPush(data interface{}) error {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 	l.list.Prepend(data)
-	return ok
+	return nil
 }
 
 // LPop removes items from the left of the list
-func (l *List) LPop() string {
+func (l *List) LPop() (interface{}, error) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 	size := l.list.Size()
 	last, ok := l.list.Get(size - 1)
 	if !ok {
-		return noExist
+		return nil, errors.New(ListNokeyError)
 	}
 	l.list.Remove(size - 1)
-	return fmt.Sprint(last)
+	return last, nil
 }
 
 // RPop removes items from the right of the list
-func (l *List) RPop() string {
+func (l *List) RPop() (interface{}, error) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 	first, ok := l.list.Get(0)
 	if !ok {
-		return noExist
+		return nil, errors.New(ListNokeyError)
 	}
 	l.list.Remove(0)
-	return fmt.Sprint(first)
+	return first, nil
 }
 
-// LLen returns length of the list
-func (l *List) LLen() int {
+// Len returns length of the list
+func (l *List) Len() interface{} {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 	return l.list.Size()
 }
 
-// LPurge remove all items from the list
-func (l *List) LPurge() string {
+// Purge remove all items from the list
+func (l *List) Purge() error {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 	l.list.Clear()
-	return ok
+	return nil
 }
