@@ -29,7 +29,7 @@ type Lru struct {
 }
 
 // NewLru instantiates new Lru cache
-func NewLru(capacity int) *Lru {
+func NewLru() *Lru {
 	l := Lru{}
 	l.cache, _ = lru.New(LruMaxKeys)
 	return &l
@@ -55,14 +55,15 @@ func (l *Lru) Set(key string, value string) error {
 }
 
 // Remove removes a key from the keyspace
-func (l *Lru) Remove(key string) error {
+func (l *Lru) Remove(key string) (interface{}, error) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
-	present := l.cache.Remove(key)
-	if !present {
-		return errors.New(LruNoKeyError)
+	if !l.cache.Contains(key) {
+		return nil, errors.New(LruNoKeyError)
 	}
-	return nil
+	value, _ := l.cache.Get(key)
+	l.cache.Remove(key)
+	return value, nil
 }
 
 // Purge completley clears the cache
@@ -74,12 +75,12 @@ func (l *Lru) Purge() error {
 }
 
 // RemoveOldest removes oldest entry in the lru
-func (l *Lru) RemoveOldest() (interface{}, error) {
+func (l *Lru) RemoveOldest() (interface{}, interface{}, error) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
-	_, value, ok := l.cache.RemoveOldest()
+	key, value, ok := l.cache.RemoveOldest()
 	if !ok {
-		return nil, errors.New(LruInternalError)
+		return nil, nil, errors.New(LruInternalError)
 	}
-	return value, nil
+	return key, value, nil
 }
