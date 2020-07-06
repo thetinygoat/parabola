@@ -17,6 +17,18 @@ package main
 
 func main() {
 	ReadConfig()
+	// manager := NewMemoryManager()
+	// if _, isDaemon := os.LookupEnv("MEMDB_DAEMON"); !isDaemon {
+	// 	daemonEnv := []string{"MEMDB_DAEMON=true"}
+	// 	childPid, _ := syscall.ForkExec(os.Args[0], os.Args, &syscall.ProcAttr{
+	// 		Env: append(os.Environ(), daemonEnv...),
+	// 		Sys: &syscall.SysProcAttr{
+	// 			Setsid: true,
+	// 		},
+	// 	})
+	// 	fmt.Printf("running daemon with pid %d", childPid)
+	// 	return
+	// }
 	conn := NewConnection("8080")
 	conn.StartConnection()
 }
