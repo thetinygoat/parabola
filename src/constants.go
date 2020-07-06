@@ -15,10 +15,12 @@
 
 package main
 
+// Misc constants
 const (
-	noExist    = "nil"
-	ok         = "ok"
-	configFile = "memdb.conf"
+	NoExist        = "nil"
+	Ok             = "ok"
+	MemoryOverLoad = "MemoryOverLoad"
+	configFile     = "memdb.conf"
 )
 
 // Lru constants
