@@ -18,36 +18,32 @@ package main
 import "sync"
 
 // Consumer specifes methods to be used for allocation and deallocation of memory
-type Consumer interface {
-	Allocate(*Manager)
-	DeAllocate(*Manager)
-}
 
 // Manager implements global memory managemnt functions
 type Manager struct {
-	maxCapacity   int
-	currentlyUsed int
+	MaxCapacity   int
+	CurrentlyUsed int
 	mutex         sync.Mutex
 }
 
 // NewMemoryManager instantiates a new memory manager
 func NewMemoryManager() *Manager {
 	m := Manager{}
-	m.maxCapacity = MaxMemory
-	m.currentlyUsed = 0
+	m.MaxCapacity = MaxMemory
+	m.CurrentlyUsed = 0
 	return &m
 }
 
 // Allocate allocates memory
-func (m *Manager) Allocate(c Consumer) {
+func (m *Manager) Allocate(chunk int) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	c.Allocate(m)
+	m.CurrentlyUsed += chunk
 }
 
-// DeAllocate allocates memory
-func (m *Manager) DeAllocate(c Consumer) {
+// Free allocates memory
+func (m *Manager) Free(chunk int) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	c.DeAllocate(m)
+	m.CurrentlyUsed -= chunk
 }
