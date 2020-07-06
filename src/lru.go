@@ -16,70 +16,70 @@
 package main
 
 import (
-	"fmt"
+	"errors"
+	"sync"
 
 	lru "github.com/hashicorp/golang-lru"
 )
 
-const (
-	maxKeys = 1000000 // max keys lru can hold
-)
-
 // Lru implements lru caching
 type Lru struct {
-	cache    *lru.Cache
-	size     int
-	capacity int
+	cache *lru.Cache
+	mutex sync.Mutex
 }
 
 // NewLru instantiates new Lru cache
 func NewLru(capacity int) *Lru {
 	l := Lru{}
-	l.cache, _ = lru.New(maxKeys)
-	l.capacity = capacity
-	l.size = 0
+	l.cache, _ = lru.New(LruMaxKeys)
 	return &l
 }
 
 // Get handles getting the values from the cache
-func (l *Lru) Get(key string) string {
-	if ok := l.cache.Contains(key); !ok {
-		return noExist
-	}
+func (l *Lru) Get(key string) (interface{}, error) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
 	value, ok := l.cache.Get(key)
 	if !ok {
-		return noExist
+		return nil, errors.New(LruNoKeyError)
 	}
-	return fmt.Sprint(value)
+	return value, nil
 }
 
 // Set handles adding values to the cache
-func (l *Lru) Set(key string, value string) string {
-	// remove oldest until we have enough room for new value
-	for l.size+len(value) > l.capacity {
-		_, value, _ := l.cache.GetOldest()
-		sizeOfOldest := len(fmt.Sprint(value))
-		l.cache.RemoveOldest()
-		l.size -= sizeOfOldest
-	}
+func (l *Lru) Set(key string, value string) error {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
 	l.cache.Add(key, value)
-	l.size += len(value)
-	return ok
+	return nil
 }
 
 // Remove removes a key from the keyspace
-func (l *Lru) Remove(key string) string {
-	if ok := l.cache.Contains(key); !ok {
-		return noExist
+func (l *Lru) Remove(key string) error {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+	present := l.cache.Remove(key)
+	if !present {
+		return errors.New(LruNoKeyError)
 	}
-	value := l.Get(key)
-	l.cache.Remove(key)
-	l.size -= len(value)
-	return ok
+	return nil
 }
 
 // Purge completley clears the cache
-func (l *Lru) Purge() string {
+func (l *Lru) Purge() error {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
 	l.cache.Purge()
-	return ok
+	return nil
+}
+
+// RemoveOldest removes oldest entry in the lru
+func (l *Lru) RemoveOldest() (interface{}, error) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+	_, value, ok := l.cache.RemoveOldest()
+	if !ok {
+		return nil, errors.New(LruInternalError)
+	}
+	return value, nil
 }
