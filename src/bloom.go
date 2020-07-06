@@ -16,38 +16,43 @@
 package main
 
 import (
-	"fmt"
+	"sync"
 
 	"github.com/willf/bloom"
 )
 
 // BloomFilter implements a bloom filter
 type BloomFilter struct {
-	maxSize uint
-	filter  *bloom.BloomFilter
+	filter *bloom.BloomFilter
+	mutex  sync.Mutex
 }
 
 // NewBloomFilter instantiates a new bloom filter
 func NewBloomFilter(m uint, k uint) *BloomFilter {
 	b := BloomFilter{}
-	b.maxSize = m
 	b.filter = bloom.New(m, k)
 	return &b
 }
 
 // Add inserts a key into the filter
-func (b *BloomFilter) Add(key string) string {
+func (b *BloomFilter) Add(key string) error {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
 	b.filter.Add([]byte(key))
-	return ok
+	return nil
 }
 
 // Get checks if a key is present in the filter
-func (b *BloomFilter) Get(key string) string {
-	return fmt.Sprint(b.filter.Test([]byte(key)))
+func (b *BloomFilter) Get(key string) interface{} {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+	return b.filter.Test([]byte(key))
 }
 
 // Purge removes all keys from the filter
-func (b *BloomFilter) Purge() string {
+func (b *BloomFilter) Purge() error {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
 	b.filter.ClearAll()
-	return ok
+	return nil
 }
