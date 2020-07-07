@@ -40,7 +40,7 @@ func NewList() *List {
 func (l *List) LPush(data interface{}) error {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
-	l.list.Append(data)
+	l.list.Prepend(data)
 	return nil
 }
 
@@ -48,12 +48,24 @@ func (l *List) LPush(data interface{}) error {
 func (l *List) RPush(data interface{}) error {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
-	l.list.Prepend(data)
+	l.list.Append(data)
 	return nil
 }
 
 // LPop removes items from the left of the list
 func (l *List) LPop() (interface{}, error) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+	first, ok := l.list.Get(0)
+	if !ok {
+		return nil, errors.New(ListNokeyError)
+	}
+	l.list.Remove(0)
+	return first, nil
+}
+
+// RPop removes items from the right of the list
+func (l *List) RPop() (interface{}, error) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 	size := l.list.Size()
@@ -63,18 +75,6 @@ func (l *List) LPop() (interface{}, error) {
 	}
 	l.list.Remove(size - 1)
 	return last, nil
-}
-
-// RPop removes items from the right of the list
-func (l *List) RPop() (interface{}, error) {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
-	first, ok := l.list.Get(0)
-	if !ok {
-		return nil, errors.New(ListNokeyError)
-	}
-	l.list.Remove(0)
-	return first, nil
 }
 
 // Len returns length of the list
