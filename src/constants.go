@@ -56,3 +56,17 @@ var OperationMode string
 
 // MaxMemory is the max memory available to memdb
 var MaxMemory int
+
+// Logo is memdb logo with info
+const Logo = `
+  ooooooooooooooooooooo
+ ooooooooooooooooooooooo	Memdb v%s %s
+ooos   ooos   sooo   sooo	
+ooos   ooos   sooo   sooo	Running in %s mode
+ooos   ooos   sooo   sooo	Port: %s
+ooooooooooooooooooooooooo
+hhhhhhhhhhhhhhhhhhhhhhhhh	https://github.com/memdb/memdb
+hhosyohoshhhdhhhsohoysohh
+ h++s/y++hd   dh++y/s++h
+
+`
