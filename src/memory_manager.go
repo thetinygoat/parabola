@@ -17,8 +17,6 @@ package main
 
 import "sync"
 
-// Consumer specifes methods to be used for allocation and deallocation of memory
-
 // Manager implements global memory managemnt functions
 type Manager struct {
 	MaxCapacity   int
