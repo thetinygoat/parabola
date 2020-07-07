@@ -15,6 +15,11 @@
 
 package main
 
+import (
+	"fmt"
+	"runtime"
+)
+
 func main() {
 	ReadConfig()
 	// manager := NewMemoryManager()
@@ -29,6 +34,8 @@ func main() {
 	// 	fmt.Printf("running daemon with pid %d", childPid)
 	// 	return
 	// }
+
+	fmt.Printf(Logo, "0.1.0", runtime.GOARCH, OperationMode, Port)
 	conn := NewConnection("8080")
 	conn.StartConnection()
 }
