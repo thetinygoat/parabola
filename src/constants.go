@@ -17,18 +17,23 @@ package main
 
 // Misc constants
 const (
-	NoExist        = "Nil"
-	Ok             = "Ok"
-	Disconnected   = "Disconnected"
-	MemoryOverLoad = "MemoryOverLoad"
-	configFile     = "memdb.conf"
+	NoExist          = "Nil"
+	Ok               = "Ok"
+	Disconnected     = "Disconnected"
+	InvalidOperation = "InvalidOperation"
+	MemoryOverLoad   = "MemoryOverLoad"
+	configFile       = "memdb.conf"
 )
 
 // Lru constants
 const (
-	LruMaxKeys       = 1000000 // max keys lru can hold
+	LruMaxKeys       = 1000 // max keys lru can hold
 	LruInternalError = "LruInternalError"
 	LruNoKeyError    = "lruNoKeyError"
+	LruGet           = "LRUGET"
+	LruSet           = "LRUSET"
+	LruRem           = "LRUREM"
+	LruPurge         = "LRUPURGE"
 )
 
 // List constants
