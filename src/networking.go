@@ -21,43 +21,60 @@ import (
 	"io"
 	"net"
 	"sync"
+
+	"github.com/emirpasic/gods/sets/hashset"
 )
 
 // Conn handles communication
 type Conn struct {
-	port    string
-	clients map[net.Addr]bool
-	mutex   sync.Mutex
+	port     string
+	listener net.Listener
+	clients  *hashset.Set
+	mutex    sync.Mutex
 }
 
 // NewConnection instantiates a new connection
-func NewConnection(port string) *Conn {
+func NewConnection() *Conn {
 	c := Conn{}
-	c.port = port
-	c.clients = make(map[net.Addr]bool)
+	c.port = Port
+	c.clients = hashset.New()
+	ln, err := net.Listen("tcp", ":"+c.port)
+	if err != nil {
+		panic(err)
+	}
+	c.listener = ln
 	return &c
 }
 
 // StartConnection starts the connection
 func (c *Conn) StartConnection() {
-	ln, err := net.Listen("tcp", ":"+c.port)
-	if err != nil {
-		panic(err)
-	}
-	defer ln.Close()
+
 	for {
-		conn, err := ln.Accept()
+		conn, err := c.listener.Accept()
+		defer c.listener.Close()
 		if err != nil {
 			panic(err)
 		}
 		c.addClient(conn)
-		fmt.Println(c.clients)
 		go c.handleConnection(conn)
+
+	}
+}
+
+// StopConnection signals clients that it has been disconnected and removes them
+func (c *Conn) StopConnection() {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	conns := c.clients.Values()
+	for _, conn := range conns {
+		conn.(net.Conn).Write([]byte(Disconnected + "\n"))
+		c.clients.Remove(conn)
 	}
 }
 
 func (c *Conn) handleConnection(conn net.Conn) {
 	for {
+		defer conn.Close()
 		buf, err := bufio.NewReader(conn).ReadString('\n')
 		if err != nil && err != io.EOF {
 			panic(err)
@@ -75,12 +92,12 @@ func (c *Conn) handleConnection(conn net.Conn) {
 
 func (c *Conn) addClient(conn net.Conn) {
 	c.mutex.Lock()
-	c.clients[conn.RemoteAddr()] = true
-	c.mutex.Unlock()
+	defer c.mutex.Unlock()
+	c.clients.Add(conn)
 }
 
 func (c *Conn) removeClient(conn net.Conn) {
 	c.mutex.Lock()
-	delete(c.clients, conn.RemoteAddr())
-	c.mutex.Unlock()
+	defer c.mutex.Unlock()
+	c.clients.Remove(conn)
 }
