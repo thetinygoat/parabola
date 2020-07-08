@@ -23,7 +23,7 @@ import (
 )
 
 func main() {
-	c, err := net.Dial("tcp", ":8080")
+	c, err := net.Dial("tcp", ":9898")
 	if err != nil {
 		panic(err)
 	}
