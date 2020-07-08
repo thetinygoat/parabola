@@ -21,23 +21,26 @@ import (
 	"io"
 	"net"
 	"sync"
+	"time"
 
 	"github.com/emirpasic/gods/sets/hashset"
 )
 
 // Conn handles communication
 type Conn struct {
-	port     string
-	listener net.Listener
-	clients  *hashset.Set
-	mutex    sync.Mutex
+	port           string
+	listener       net.Listener
+	clients        *hashset.Set
+	requestManager *RequestManager
+	mutex          sync.Mutex
 }
 
 // NewConnection instantiates a new connection
-func NewConnection() *Conn {
+func NewConnection(memoryManager *MemoryManager) *Conn {
 	c := Conn{}
 	c.port = Port
 	c.clients = hashset.New()
+	c.requestManager = NewRequestManager(memoryManager)
 	ln, err := net.Listen("tcp", ":"+c.port)
 	if err != nil {
 		panic(err)
@@ -80,10 +83,13 @@ func (c *Conn) handleConnection(conn net.Conn) {
 			panic(err)
 		}
 		if len(buf) > 0 {
-			conn.Write([]byte(buf))
+			start := time.Now()
+			res := c.requestManager.ParseRequestString(buf)
+			conn.Write([]byte(res + "\n"))
+			end := time.Now()
+			fmt.Println("query took ", end.Sub(start))
 		} else {
 			c.removeClient(conn)
-			fmt.Println(c.clients)
 			conn.Close()
 			return
 		}
