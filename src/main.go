@@ -15,27 +15,6 @@
 
 package main
 
-import (
-	"fmt"
-	"runtime"
-)
-
 func main() {
-	ReadConfig()
-	// manager := NewMemoryManager()
-	// if _, isDaemon := os.LookupEnv("MEMDB_DAEMON"); !isDaemon {
-	// 	daemonEnv := []string{"MEMDB_DAEMON=true"}
-	// 	childPid, _ := syscall.ForkExec(os.Args[0], os.Args, &syscall.ProcAttr{
-	// 		Env: append(os.Environ(), daemonEnv...),
-	// 		Sys: &syscall.SysProcAttr{
-	// 			Setsid: true,
-	// 		},
-	// 	})
-	// 	fmt.Printf("running daemon with pid %d", childPid)
-	// 	return
-	// }
-
-	fmt.Printf(Logo, "0.1.0", runtime.GOARCH, OperationMode, Port)
-	conn := NewConnection("8080")
-	conn.StartConnection()
+	bootstrap()
 }
