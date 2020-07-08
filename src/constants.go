@@ -17,8 +17,9 @@ package main
 
 // Misc constants
 const (
-	NoExist        = "nil"
-	Ok             = "ok"
+	NoExist        = "Nil"
+	Ok             = "Ok"
+	Disconnected   = "Disconnected"
 	MemoryOverLoad = "MemoryOverLoad"
 	configFile     = "memdb.conf"
 )
