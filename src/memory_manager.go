@@ -17,30 +17,30 @@ package main
 
 import "sync"
 
-// Manager implements global memory managemnt functions
-type Manager struct {
+// MemoryManager implements global memory managemnt functions
+type MemoryManager struct {
 	MaxCapacity   int
 	CurrentlyUsed int
 	mutex         sync.Mutex
 }
 
 // NewMemoryManager instantiates a new memory manager
-func NewMemoryManager() *Manager {
-	m := Manager{}
+func NewMemoryManager() *MemoryManager {
+	m := MemoryManager{}
 	m.MaxCapacity = MaxMemory
 	m.CurrentlyUsed = 0
 	return &m
 }
 
 // Allocate allocates memory
-func (m *Manager) Allocate(chunk int) {
+func (m *MemoryManager) Allocate(chunk int) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	m.CurrentlyUsed += chunk
 }
 
 // Free allocates memory
-func (m *Manager) Free(chunk int) {
+func (m *MemoryManager) Free(chunk int) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	m.CurrentlyUsed -= chunk
