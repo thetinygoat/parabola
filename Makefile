@@ -4,3 +4,6 @@ build:
 
 run:
 	./bin/memdb
+
+run_client:
+	./bin/client
