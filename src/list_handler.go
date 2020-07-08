@@ -27,11 +27,11 @@ type listContainer struct {
 // ListHandler implements methods for managing lists
 type ListHandler struct {
 	listspace map[string]*listContainer
-	manager   *Manager
+	manager   *MemoryManager
 }
 
 // NewListHandler instantiates a new list
-func NewListHandler(m *Manager) *ListHandler {
+func NewListHandler(m *MemoryManager) *ListHandler {
 	l := ListHandler{}
 	l.listspace = make(map[string]*listContainer)
 	l.manager = m

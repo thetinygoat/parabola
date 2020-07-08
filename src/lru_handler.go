@@ -22,12 +22,12 @@ import (
 // LruHandler implemnts methods to manage the lru cache
 type LruHandler struct {
 	cache   *Lru
-	manager *Manager
+	manager *MemoryManager
 	memUsed int
 }
 
 // NewLruHandler instantiates a new lru handler
-func NewLruHandler(m *Manager) *LruHandler {
+func NewLruHandler(m *MemoryManager) *LruHandler {
 	l := LruHandler{}
 	l.cache = NewLru()
 	l.manager = m
@@ -35,12 +35,13 @@ func NewLruHandler(m *Manager) *LruHandler {
 	return &l
 }
 
-// LRSet inserts an item to the lru
-func (l *LruHandler) LRSet(key, value string) string {
+// LRUSet inserts an item to the lru
+func (l *LruHandler) LRUSet(key, value string) string {
 	iter := 0
 	for l.manager.CurrentlyUsed+len(value)+len(key) >= l.manager.MaxCapacity && iter < 100 {
 		rkey, rvalue, err := l.cache.RemoveOldest()
 		if err != nil {
+			fmt.Println(err)
 			panic(err)
 		}
 		l.manager.Free(len(fmt.Sprint(rkey)) + len(fmt.Sprint(rvalue)))
@@ -59,8 +60,8 @@ func (l *LruHandler) LRSet(key, value string) string {
 	return Ok
 }
 
-// LRGet returns a key from the lru
-func (l *LruHandler) LRGet(key string) string {
+// LRUGet returns a key from the lru
+func (l *LruHandler) LRUGet(key string) string {
 	value, err := l.cache.Get(key)
 	if err != nil {
 		return NoExist
@@ -68,8 +69,8 @@ func (l *LruHandler) LRGet(key string) string {
 	return fmt.Sprint(value)
 }
 
-// LRRemove removes a key from the lru
-func (l *LruHandler) LRRemove(key string) string {
+// LRURemove removes a key from the lru
+func (l *LruHandler) LRURemove(key string) string {
 	value, err := l.cache.Remove(key)
 	if err != nil {
 		return NoExist
@@ -79,8 +80,8 @@ func (l *LruHandler) LRRemove(key string) string {
 	return fmt.Sprint(value)
 }
 
-// LRPurge clears the lru
-func (l *LruHandler) LRPurge(key string) string {
+// LRUPurge clears the lru
+func (l *LruHandler) LRUPurge() string {
 	err := l.cache.Purge()
 	l.manager.Free(l.memUsed)
 	l.memUsed = 0
