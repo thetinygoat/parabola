@@ -44,10 +44,10 @@ func bootstrap() {
 	exit := make(chan os.Signal, 1)
 	signal.Notify(exit, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM)
 
-	// manager := NewMemoryManager()
+	memoryManager := NewMemoryManager()
 	var conn *Conn
 	go func() {
-		conn = NewConnection()
+		conn = NewConnection(memoryManager)
 		conn.StartConnection()
 	}()
 	if !*daemonptr {
