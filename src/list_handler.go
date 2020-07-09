@@ -40,6 +40,9 @@ func NewListHandler(m *MemoryManager) *ListHandler {
 
 // LPush inserts items to the left of the list
 func (l *ListHandler) LPush(name, data string) string {
+	if l.manager.CurrentlyUsed+len(data) >= l.manager.MaxCapacity {
+		return MemoryLimitExceeded
+	}
 	list, ok := l.listspace[name]
 	if !ok {
 		list = &listContainer{list: NewList(), memUsed: 0}
@@ -56,6 +59,9 @@ func (l *ListHandler) LPush(name, data string) string {
 
 // RPush inserts items to the right of the list
 func (l *ListHandler) RPush(name, data string) string {
+	if l.manager.CurrentlyUsed+len(data) >= l.manager.MaxCapacity {
+		return MemoryLimitExceeded
+	}
 	list, ok := l.listspace[name]
 	if !ok {
 		list = &listContainer{list: NewList(), memUsed: 0}
@@ -163,7 +169,7 @@ func (l *ListHandler) LGetIdx(name string, idx int) string {
 	if !ok {
 		return NoExist
 	}
-	dataRaw, err := list.list.RemIdx(idx)
+	dataRaw, err := list.list.GetIdx(idx)
 	if err != nil {
 		return fmt.Sprint(err)
 	}
