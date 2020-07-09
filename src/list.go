@@ -58,7 +58,7 @@ func (l *List) LPop() (interface{}, error) {
 	defer l.mutex.Unlock()
 	first, ok := l.list.Get(0)
 	if !ok {
-		return nil, errors.New(ListNokeyError)
+		return nil, errors.New(ListEmptyError)
 	}
 	l.list.Remove(0)
 	return first, nil
@@ -71,7 +71,7 @@ func (l *List) RPop() (interface{}, error) {
 	size := l.list.Size()
 	last, ok := l.list.Get(size - 1)
 	if !ok {
-		return nil, errors.New(ListNokeyError)
+		return nil, errors.New(ListEmptyError)
 	}
 	l.list.Remove(size - 1)
 	return last, nil
@@ -98,7 +98,7 @@ func (l *List) GetIdx(idx int) (interface{}, error) {
 	defer l.mutex.Unlock()
 	val, ok := l.list.Get(idx)
 	if !ok {
-		return nil, errors.New("InvalidIdx")
+		return nil, errors.New(ListInvalidIdxError)
 	}
 	return val, nil
 }
@@ -109,7 +109,7 @@ func (l *List) RemIdx(idx int) (interface{}, error) {
 	defer l.mutex.Unlock()
 	val, ok := l.list.Get(idx)
 	if !ok {
-		return nil, errors.New("InvalidIdx")
+		return nil, errors.New(ListInvalidIdxError)
 	}
 	l.list.Remove(idx)
 	return val, nil

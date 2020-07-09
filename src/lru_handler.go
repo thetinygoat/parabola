@@ -49,7 +49,7 @@ func (l *LruHandler) LRUSet(key, value string) string {
 		iter++
 	}
 	if iter >= 100 {
-		return MemoryOverLoad
+		return MemoryLimitExceeded
 	}
 	l.manager.Allocate(len(key) + len(value))
 	l.memUsed += len(key) + len(value)

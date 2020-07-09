@@ -17,6 +17,7 @@ package main
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -38,13 +39,16 @@ func NewRequestManager(memoryManager *MemoryManager) *RequestManager {
 // ParseRequestString parses request string and passes the request to
 // suitable handler
 func (m *RequestManager) ParseRequestString(req string) string {
+	if len(req) <= 0 {
+		return InvalidOperation
+	}
 	req = req[:len(req)-1]
 	listRegex := regexp.MustCompile("^L")
 	lruRegex := regexp.MustCompile("^LRU")
 	if lruRegex.MatchString(req) {
 		return m.parseLruQuery(req)
 	} else if listRegex.MatchString(req) {
-		return "List handler reached"
+		return m.parseListQuery(req)
 	}
 	return InvalidOperation
 }
@@ -69,6 +73,67 @@ func (m *RequestManager) parseLruQuery(query string) string {
 		return m.lruHandler.LRURemove(q[1])
 	case LruPurge:
 		return m.lruHandler.LRUPurge()
+	default:
+		return InvalidOperation
+	}
+}
+
+func (m *RequestManager) parseListQuery(query string) string {
+	q := strings.Split(query, " ")
+	switch q[0] {
+	case LPush:
+		if len(q) < 3 {
+			return InvalidOperation
+		}
+		return m.listHandler.LPush(q[1], q[2])
+	case RPush:
+		if len(q) < 3 {
+			return InvalidOperation
+		}
+		return m.listHandler.RPush(q[1], q[2])
+	case LPop:
+		if len(q) < 2 {
+			return InvalidOperation
+		}
+		return m.listHandler.LPop(q[1])
+	case RPop:
+		if len(q) < 2 {
+			return InvalidOperation
+		}
+		return m.listHandler.RPop(q[1])
+	case LClean:
+		if len(q) < 2 {
+			return InvalidOperation
+		}
+		return m.listHandler.LClean(q[1])
+	case LDel:
+		if len(q) < 2 {
+			return InvalidOperation
+		}
+		return m.listHandler.LDel(q[1])
+	case LGetIdx:
+		if len(q) < 3 {
+			return InvalidOperation
+		}
+		idx, err := strconv.Atoi(q[2])
+		if err != nil {
+			return InvalidIdx
+		}
+		return m.listHandler.LGetIdx(q[1], idx)
+	case LRemIdx:
+		if len(q) < 3 {
+			return InvalidOperation
+		}
+		idx, err := strconv.Atoi(q[2])
+		if err != nil {
+			return InvalidIdx
+		}
+		return m.listHandler.LRemIdx(q[1], idx)
+	case LLen:
+		if len(q) < 2 {
+			return InvalidOperation
+		}
+		return m.listHandler.LLen(q[1])
 	default:
 		return InvalidOperation
 	}
