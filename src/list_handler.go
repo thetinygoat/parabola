@@ -140,3 +140,33 @@ func (l *ListHandler) LDel(name string) string {
 	delete(l.listspace, name)
 	return Ok
 }
+
+// LRemIdx removes data from a particular index
+func (l *ListHandler) LRemIdx(name string, idx int) string {
+	list, ok := l.listspace[name]
+	if !ok {
+		return NoExist
+	}
+	dataRaw, err := list.list.RemIdx(idx)
+	if err != nil {
+		return fmt.Sprint(err)
+	}
+	data := fmt.Sprint(dataRaw)
+	list.memUsed -= len(data)
+	l.manager.Free(len(data))
+	return data
+}
+
+// LGetIdx returns data from a particular index
+func (l *ListHandler) LGetIdx(name string, idx int) string {
+	list, ok := l.listspace[name]
+	if !ok {
+		return NoExist
+	}
+	dataRaw, err := list.list.RemIdx(idx)
+	if err != nil {
+		return fmt.Sprint(err)
+	}
+	data := fmt.Sprint(dataRaw)
+	return data
+}

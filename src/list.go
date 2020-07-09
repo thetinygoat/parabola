@@ -91,3 +91,26 @@ func (l *List) Purge() error {
 	l.list.Clear()
 	return nil
 }
+
+// GetIdx returns data at a particular index
+func (l *List) GetIdx(idx int) (interface{}, error) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+	val, ok := l.list.Get(idx)
+	if !ok {
+		return nil, errors.New("InvalidIdx")
+	}
+	return val, nil
+}
+
+// RemIdx removes data at a particular index
+func (l *List) RemIdx(idx int) (interface{}, error) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+	val, ok := l.list.Get(idx)
+	if !ok {
+		return nil, errors.New("InvalidIdx")
+	}
+	l.list.Remove(idx)
+	return val, nil
+}
