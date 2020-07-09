@@ -17,29 +17,42 @@ package main
 
 // Misc constants
 const (
-	NoExist          = "Nil"
-	Ok               = "Ok"
-	Disconnected     = "Disconnected"
-	InvalidOperation = "InvalidOperation"
-	MemoryOverLoad   = "MemoryOverLoad"
-	configFile       = "memdb.conf"
+	NoExist             = "Nil"
+	Ok                  = "Ok"
+	Disconnected        = "Disconnected"
+	InvalidOperation    = "InvalidOperation"
+	InvalidIdx          = "InvalidIdx"
+	MemoryLimitExceeded = "MemoryLimitExceeded"
+	configFile          = "memdb.conf"
 )
 
 // Lru constants
 const (
 	LruMaxKeys       = 1000 // max keys lru can hold
 	LruInternalError = "LruInternalError"
-	LruNoKeyError    = "lruNoKeyError"
-	LruGet           = "LRUGET"
-	LruSet           = "LRUSET"
-	LruRem           = "LRUREM"
-	LruPurge         = "LRUPURGE"
+	LruNoKeyError    = "LruNoKeyError"
+
+	LruGet   = "LRUGET"
+	LruSet   = "LRUSET"
+	LruRem   = "LRUREM"
+	LruPurge = "LRUPURGE"
 )
 
 // List constants
 const (
-	ListNokeyError    = "ListNokeyError"
-	ListInternalError = "ListInternalError"
+	ListEmptyError      = "ListEmptyError"
+	ListInternalError   = "ListInternalError"
+	ListInvalidIdxError = "ListInvalidIdxError"
+
+	LPush   = "LLPUSH"
+	RPush   = "LRPUSH"
+	LPop    = "LLPOP"
+	RPop    = "LRPOP"
+	LLen    = "LLEN"
+	LClean  = "LCLEAN"
+	LDel    = "LDEL"
+	LGetIdx = "LGETIDX"
+	LRemIdx = "LREMIDX"
 )
 
 // HMap constants
