@@ -23,7 +23,7 @@ const (
 	InvalidOperation    = "InvalidOperation"
 	InvalidIdx          = "InvalidIdx"
 	MemoryLimitExceeded = "MemoryLimitExceeded"
-	configFile          = "memdb.conf"
+	configFile          = "dictX.conf"
 )
 
 // Lru constants
@@ -61,10 +61,10 @@ const (
 	HMapInternalError = "HMapInternalError"
 )
 
-// Port is the port memdb runs on
+// Port is the port dictX runs on
 var Port string
 
-// Password is the memdb password
+// Password is the dictX password
 var Password string
 
 // EvictionPolicy is the cache eviction policy
@@ -73,18 +73,18 @@ var EvictionPolicy string
 // OperationMode specifies mode of operation ie clustereor normal
 var OperationMode string
 
-// MaxMemory is the max memory available to memdb
+// MaxMemory is the max memory available to dictX
 var MaxMemory int
 
-// Logo is memdb logo with info
+// Logo is dictX logo with info
 const Logo = `
   ooooooooooooooooooooo
- ooooooooooooooooooooooo	Memdb v%s %s
+ ooooooooooooooooooooooo	DictX v%s %s
 ooos   ooos   sooo   sooo	
 ooos   ooos   sooo   sooo	Running in %s mode
 ooos   ooos   sooo   sooo	Port: %s
 ooooooooooooooooooooooooo
-hhhhhhhhhhhhhhhhhhhhhhhhh	https://github.com/memdb/memdb
+hhhhhhhhhhhhhhhhhhhhhhhhh	https://github.com/dictX/dictX
 hhosyohoshhhdhhhsohoysohh
  h++s/y++hd   dh++y/s++h
 

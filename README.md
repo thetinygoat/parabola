@@ -1,1 +1,0 @@
-![Alt Text](https://dev-to-uploads.s3.amazonaws.com/i/jl6quzqg0p0xkllydf42.png)

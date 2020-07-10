@@ -28,15 +28,15 @@ func bootstrap() {
 	daemonptr := flag.Bool("d", false, "start as a daemon")
 	flag.Parse()
 	if *daemonptr {
-		if _, isDaemon := os.LookupEnv("MEMDB_DAEMON"); !isDaemon {
-			daemonEnv := []string{"MEMDB_DAEMON=true"}
+		if _, isDaemon := os.LookupEnv("DICTX_DAEMON"); !isDaemon {
+			daemonEnv := []string{"DICTX_DAEMON=true"}
 			childPid, _ := syscall.ForkExec(os.Args[0], os.Args, &syscall.ProcAttr{
 				Env: append(os.Environ(), daemonEnv...),
 				Sys: &syscall.SysProcAttr{
 					Setsid: true,
 				},
 			})
-			fmt.Printf("running memdb daemon with pid %d\n", childPid)
+			fmt.Printf("running dictX daemon with pid %d\n", childPid)
 			return
 		}
 	}
