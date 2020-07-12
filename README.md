@@ -10,7 +10,7 @@ DictX is a lightweight and fast in-memory data structure store, which provides s
 
 # Contributing
 
-The rules and regulations for contributing are listed in [contributing.md]().
+The rules and regulations for contributing are listed in [contributing.md](https://github.com/dictX/dictX/blob/master/CONTRIBUTING.md).
 
   
 
