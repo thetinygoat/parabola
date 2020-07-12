@@ -48,6 +48,9 @@ func parseMemory(memory string) int {
 
 // set global vars
 func setVar(pair []string) {
+	if len(pair) < 2 {
+		panic("InvalidConfigFile")
+	}
 	switch pair[0] {
 	case "port":
 		Port = pair[1]
@@ -59,6 +62,24 @@ func setVar(pair []string) {
 		OperationMode = pair[1]
 	case "max-memory":
 		MaxMemory = parseMemory(pair[1])
+	case "bloom-enable":
+		b, err := strconv.ParseBool(pair[1])
+		if err != nil {
+			panic(err)
+		}
+		BloomEnable = b
+	case "bloom-bits":
+		u, err := strconv.ParseUint(pair[1], 10, 32)
+		if err != nil {
+			panic(err)
+		}
+		BloomBits = uint(u)
+	case "bloom-hashes":
+		u, err := strconv.ParseUint(pair[1], 10, 32)
+		if err != nil {
+			panic(err)
+		}
+		BloomHashes = uint(u)
 	}
 }
 

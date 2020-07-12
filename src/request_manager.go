@@ -23,8 +23,9 @@ import (
 
 // RequestManager holds handlers for different data structures
 type RequestManager struct {
-	lruHandler  *LruHandler
-	listHandler *ListHandler
+	lruHandler   *LruHandler
+	listHandler  *ListHandler
+	bloomHandler *BloomHandler
 }
 
 // NewRequestManager instantiates a new request manager
@@ -32,7 +33,7 @@ func NewRequestManager(memoryManager *MemoryManager) *RequestManager {
 	m := RequestManager{}
 	m.lruHandler = NewLruHandler(memoryManager)
 	m.listHandler = NewListHandler(memoryManager)
-
+	m.bloomHandler = NewBloomHandler(memoryManager)
 	return &m
 }
 
@@ -45,10 +46,13 @@ func (m *RequestManager) ParseRequestString(req string) string {
 	req = req[:len(req)-1]
 	listRegex := regexp.MustCompile("^L")
 	lruRegex := regexp.MustCompile("^LRU")
+	bloomRegex := regexp.MustCompile("^BF")
 	if lruRegex.MatchString(req) {
 		return m.parseLruQuery(req)
 	} else if listRegex.MatchString(req) {
 		return m.parseListQuery(req)
+	} else if bloomRegex.MatchString(req) {
+		return m.parseBFQuery(req)
 	}
 	return InvalidOperation
 }
@@ -134,6 +138,26 @@ func (m *RequestManager) parseListQuery(query string) string {
 			return InvalidOperation
 		}
 		return m.listHandler.LLen(q[1])
+	default:
+		return InvalidOperation
+	}
+}
+
+func (m *RequestManager) parseBFQuery(query string) string {
+	q := strings.Split(query, " ")
+	switch q[0] {
+	case BFAdd:
+		if len(q) < 2 {
+			return InvalidOperation
+		}
+		return m.bloomHandler.BFAdd(q[1])
+	case BFTest:
+		if len(q) < 2 {
+			return InvalidOperation
+		}
+		return m.bloomHandler.BFTest(q[1])
+	case BFPurge:
+		return m.bloomHandler.BFPurge()
 	default:
 		return InvalidOperation
 	}

@@ -42,8 +42,8 @@ func (b *BloomFilter) Add(key string) error {
 	return nil
 }
 
-// Get checks if a key is present in the filter
-func (b *BloomFilter) Get(key string) interface{} {
+// Test checks if a key is present in the filter
+func (b *BloomFilter) Test(key string) bool {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
 	return b.filter.Test([]byte(key))

@@ -61,6 +61,13 @@ const (
 	HMapInternalError = "HMapInternalError"
 )
 
+// Bloom filter constants
+const (
+	BFAdd   = "BFADD"
+	BFTest  = "BFTEST"
+	BFPurge = "BFPURGE"
+)
+
 // Port is the port dictX runs on
 var Port string
 
@@ -75,6 +82,15 @@ var OperationMode string
 
 // MaxMemory is the max memory available to dictX
 var MaxMemory int
+
+// BloomEnable tells if bloom filter functionality is enabled or not
+var BloomEnable bool
+
+// BloomBits is the number of bits in a bloom filter
+var BloomBits uint
+
+// BloomHashes is the no. of hashing functions
+var BloomHashes uint
 
 // Logo is dictX logo with info
 const Logo = `

@@ -53,6 +53,13 @@ func bootstrap() {
 	if !*daemonptr {
 		fmt.Printf(Logo, "0.1.0", runtime.GOARCH, OperationMode, Port)
 	}
+	if BloomEnable {
+		if memoryManager.MaxCapacity > int(BloomBits/8) {
+			memoryManager.Allocate(int(BloomBits / 8))
+		} else {
+			panic("Not Enough memory for bloom filter to operate, consider decreasing the bits or increasing memory limit")
+		}
+	}
 	intr := <-exit
 	conn.StopConnection()
 	if !*daemonptr {
