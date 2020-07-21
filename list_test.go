@@ -27,7 +27,7 @@ func TestNewList(t *testing.T) {
 	}
 }
 
-func TestAllocate(t *testing.T) {
+func TestListAllocate(t *testing.T) {
 	list := NewList()
 	d1 := "sachin"
 	list.Append(d1)
@@ -46,7 +46,7 @@ func TestAllocate(t *testing.T) {
 	}
 }
 
-func TestFree(t *testing.T) {
+func TestListFree(t *testing.T) {
 	list := NewList()
 	d1 := "sachin"
 	d2 := "saini"
