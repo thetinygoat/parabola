@@ -16,12 +16,12 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"net"
 	"time"
 
 	"github.com/thetinygoat/dictX/dxep"
+	"github.com/thetinygoat/dictX/parser"
 )
 
 const (
@@ -69,8 +69,6 @@ func (srv *Server) read(conn net.Conn) {
 			log.Fatal(err)
 		}
 		arr, _ := msg.Array()
-		for _, m := range arr {
-			fmt.Println(m.Str())
-		}
+		parser.Parse(arr)
 	}
 }
