@@ -20,27 +20,28 @@ import (
 
 // Hash describes a hashmap
 type Hash struct {
-	hash   map[interface{}]*hashmap.Map
+	hash   map[string]*hashmap.Map
 	memory int64
 }
 
 // New instantiates a new hash
 func New() *Hash {
-	return &Hash{hash: make(map[interface{}]*hashmap.Map), memory: 0}
+	return &Hash{hash: make(map[string]*hashmap.Map), memory: 0}
 }
 
 // Get returns the value associated with a key and a bool to indicate if the value was found
-func (h *Hash) Get(superKey, key interface{}) (value interface{}, found bool) {
+func (h *Hash) Get(superKey, key string) (value string, found bool) {
 	// get hash from the hash space
 	hash, found := h.hash[superKey]
 	if !found {
-		return nil, false
+		return "", false
 	}
-	return hash.Get(key)
+	val, found := hash.Get(key)
+	return str(val), found
 }
 
 // Put adds or updates a field in a specified hash
-func (h *Hash) Put(superKey, key, value interface{}) {
+func (h *Hash) Put(superKey, key, value string) {
 	hash, found := h.hash[superKey]
 	if !found {
 		h.hash[superKey] = hashmap.New()
@@ -57,7 +58,7 @@ func (h *Hash) Put(superKey, key, value interface{}) {
 }
 
 // Remove removes a field from the specified hash
-func (h *Hash) Remove(superKey, key interface{}) {
+func (h *Hash) Remove(superKey, key string) {
 	hash, found := h.hash[superKey]
 	if !found {
 		return
@@ -71,7 +72,7 @@ func (h *Hash) Remove(superKey, key interface{}) {
 }
 
 // Size returns the size of the specified hash
-func (h *Hash) Size(superKey, key interface{}) int64 {
+func (h *Hash) Size(superKey, key string) int64 {
 	hash, found := h.hash[superKey]
 	if !found {
 		return -1
@@ -80,7 +81,7 @@ func (h *Hash) Size(superKey, key interface{}) int64 {
 }
 
 // Empty returns if the specified hash is empty or not
-func (h *Hash) Empty(superKey, key interface{}) int {
+func (h *Hash) Empty(superKey, key string) int {
 	hash, found := h.hash[superKey]
 	if !found {
 		return -1
@@ -96,12 +97,12 @@ func (h *Hash) Memory() int64 {
 	return h.memory
 }
 
-func (h *Hash) allocate(data interface{}) {
-	h.memory += int64(len(str(data)))
+func (h *Hash) allocate(data string) {
+	h.memory += int64(len(data))
 }
 
-func (h *Hash) free(data interface{}) {
-	h.memory -= int64(len(str(data)))
+func (h *Hash) free(data string) {
+	h.memory -= int64(len(data))
 }
 
 func str(data interface{}) string {
