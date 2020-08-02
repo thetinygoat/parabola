@@ -46,13 +46,14 @@ var (
 type ParsedQuery struct {
 	cmd    string
 	subcmd string
+	key    string
 	data   []string
 }
 
-func Parse(query []*dxep.Message) {
+func Parse(query []*dxep.Message) (*ParsedQuery, error) {
 	err := validate(query)
 	if err != nil {
-		return
+		return nil, err
 	}
 	tokens := make([]string, len(query))
 	for i, token := range query {
@@ -62,19 +63,38 @@ func Parse(query []*dxep.Message) {
 	switch cmd {
 	case Hash:
 		fmt.Println("reached hash query parser")
-		parseHashQuery(tokens)
+		subcmd, key, data, err := parseHashQuery(tokens)
+		if err != nil {
+			return nil, err
+		}
+		return &ParsedQuery{cmd: cmd, subcmd: subcmd, key: key, data: data}, nil
 	case Set:
 		fmt.Println("reached set query parser")
-
+		subcmd, key, data, err := parseSetQuery(tokens)
+		if err != nil {
+			return nil, err
+		}
+		return &ParsedQuery{cmd: cmd, subcmd: subcmd, key: key, data: data}, nil
 	case List:
 		fmt.Println("reached list query parser")
-
+		subcmd, key, data, err := parseListQuery(tokens)
+		fmt.Println(len(data))
+		if err != nil {
+			return nil, err
+		}
+		return &ParsedQuery{cmd: cmd, subcmd: subcmd, key: key, data: data}, nil
 	case Key:
 		fmt.Println("reached key query parser")
+		subcmd, key, data, err := parseKeyQuery(tokens)
+		if err != nil {
+			return nil, err
+		}
+		return &ParsedQuery{cmd: cmd, subcmd: subcmd, key: key, data: data}, nil
 	default:
 		fmt.Println("invalid command")
 
 	}
+	return nil, errValidate
 }
 
 //list of hash commands
@@ -82,22 +102,124 @@ func Parse(query []*dxep.Message) {
 //hash get key field
 //hash del key field
 
-func parseHashQuery(tokens []string) (string, []string, error) {
-	if len(tokens) < 3 {
-		return "", nil, errValidate
+func parseHashQuery(tokens []string) (string, string, []string, error) {
+	if len(tokens) <= 3 {
+		return "", "", nil, errValidate
 	}
 	subcmd := tokens[1]
+	key := tokens[2]
+	data := tokens[3:]
 	switch subcmd {
 	case "put":
 		fmt.Println("reached hash put")
+		if len(data) >= 2 && len(data)%2 == 0 {
+			return subcmd, key, data, nil
+		}
+		return "", "", nil, errValidate
+
 	case "del":
 		fmt.Println("reached hash del")
+		if len(data) > 1 {
+			return "", "", nil, errValidate
+		}
+		return subcmd, key, data, nil
 	case "get":
 		fmt.Println("reached hash get")
+		if len(data) > 1 {
+			return "", "", nil, errValidate
+		}
+		return subcmd, key, data, nil
 	default:
-		return "", nil, errValidate
+		return "", "", nil, errValidate
 	}
-	return "", nil, errValidate
+}
+
+//list of set queries
+//set add key value
+//set contains key value
+//set del key value
+func parseSetQuery(tokens []string) (string, string, []string, error) {
+	if len(tokens) < 4 {
+		return "", "", nil, errValidate
+	}
+	subcmd := tokens[1]
+	key := tokens[2]
+	data := tokens[3:]
+	switch subcmd {
+	case "add":
+		if len(data) <= 0 {
+			return "", "", nil, errValidate
+		}
+		return subcmd, key, data, nil
+	case "contains":
+		if len(data) > 1 {
+			return "", "", nil, errValidate
+		}
+		return subcmd, key, data, nil
+	case "del":
+		if len(data) > 1 {
+			return "", "", nil, errValidate
+		}
+		return subcmd, key, data, nil
+	default:
+		return "", "", nil, errValidate
+	}
+
+}
+
+//list of key queries
+//key put key value ex
+//key get key
+//key del key
+func parseKeyQuery(tokens []string) (string, string, []string, error) {
+	if len(tokens) < 3 {
+		return "", "", nil, errValidate
+	}
+	subcmd := tokens[1]
+	key := tokens[2]
+	data := tokens[3:]
+	switch subcmd {
+	case "put":
+		if len(data) < 2 {
+			return "", "", nil, errValidate
+		}
+		return subcmd, key, data, nil
+	case "get", "del":
+		if len(data) > 0 {
+			return "", "", nil, errValidate
+		}
+		return subcmd, key, data, nil
+	default:
+		return "", "", nil, errValidate
+	}
+}
+
+//list of list commands
+//list fpush key value
+//list rpush key value
+//list fpop key
+//list rpop key
+func parseListQuery(tokens []string) (string, string, []string, error) {
+	if len(tokens) < 3 {
+		return "", "", nil, errValidate
+	}
+	subcmd := tokens[1]
+	key := tokens[2]
+	data := tokens[3:]
+	switch subcmd {
+	case "fpush", "rpush":
+		if len(data) <= 0 {
+			return "", "", nil, errValidate
+		}
+		return subcmd, key, data, nil
+	case "fpop", "rpop":
+		if len(data) > 0 {
+			return "", "", nil, errValidate
+		}
+		return subcmd, key, data, nil
+	default:
+		return "", "", nil, errValidate
+	}
 }
 
 func validate(query []*dxep.Message) error {
