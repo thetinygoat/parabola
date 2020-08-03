@@ -46,9 +46,9 @@ func (h *Hash) Put(superKey, key, value string) {
 	if !found {
 		h.hash[superKey] = hashmap.New()
 	} else {
-		value, found := hash.Get(key)
+		val, found := hash.Get(key)
 		if found {
-			h.free(value)
+			h.free(str(val))
 			h.free(key)
 		}
 	}
@@ -66,7 +66,7 @@ func (h *Hash) Remove(superKey, key string) {
 	value, found := hash.Get(key)
 	if found {
 		h.free(key)
-		h.free(value)
+		h.free(str(value))
 		hash.Remove(key)
 	}
 }
