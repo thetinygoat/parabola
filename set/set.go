@@ -63,6 +63,10 @@ func (s *Set) Size(key string) int64 {
 	return int64(set.Size())
 }
 
+func (s *Set) Memory() int64 {
+	return s.memory
+}
+
 func (s *Set) allocate(data string) {
 	s.memory += int64(len(data))
 }

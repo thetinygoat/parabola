@@ -79,6 +79,10 @@ func (l *List) Size(key string) int64 {
 	return int64(list.Size())
 }
 
+func (l *List) Memory() int64 {
+	return l.memory
+}
+
 func (l *List) allocate(data string) {
 	l.memory += int64(len(data))
 }
