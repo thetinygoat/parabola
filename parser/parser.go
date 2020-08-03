@@ -18,7 +18,6 @@ package parser
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/thetinygoat/dictX/dxep"
@@ -62,39 +61,33 @@ func Parse(query []*dxep.Message) (*ParsedQuery, error) {
 	cmd := strings.ToUpper(tokens[0])
 	switch cmd {
 	case Hash:
-		fmt.Println("reached hash query parser")
 		subcmd, key, data, err := parseHashQuery(tokens)
 		if err != nil {
 			return nil, err
 		}
 		return &ParsedQuery{cmd: cmd, subcmd: subcmd, key: key, data: data}, nil
 	case Set:
-		fmt.Println("reached set query parser")
 		subcmd, key, data, err := parseSetQuery(tokens)
 		if err != nil {
 			return nil, err
 		}
 		return &ParsedQuery{cmd: cmd, subcmd: subcmd, key: key, data: data}, nil
 	case List:
-		fmt.Println("reached list query parser")
 		subcmd, key, data, err := parseListQuery(tokens)
-		fmt.Println(len(data))
 		if err != nil {
 			return nil, err
 		}
 		return &ParsedQuery{cmd: cmd, subcmd: subcmd, key: key, data: data}, nil
 	case Key:
-		fmt.Println("reached key query parser")
 		subcmd, key, data, err := parseKeyQuery(tokens)
 		if err != nil {
 			return nil, err
 		}
 		return &ParsedQuery{cmd: cmd, subcmd: subcmd, key: key, data: data}, nil
 	default:
-		fmt.Println("invalid command")
+		return nil, errValidate
 
 	}
-	return nil, errValidate
 }
 
 //list of hash commands
@@ -111,20 +104,17 @@ func parseHashQuery(tokens []string) (string, string, []string, error) {
 	data := tokens[3:]
 	switch subcmd {
 	case "put":
-		fmt.Println("reached hash put")
 		if len(data) >= 2 && len(data)%2 == 0 {
 			return subcmd, key, data, nil
 		}
 		return "", "", nil, errValidate
 
 	case "del":
-		fmt.Println("reached hash del")
 		if len(data) > 1 {
 			return "", "", nil, errValidate
 		}
 		return subcmd, key, data, nil
 	case "get":
-		fmt.Println("reached hash get")
 		if len(data) > 1 {
 			return "", "", nil, errValidate
 		}
@@ -232,4 +222,19 @@ func validate(query []*dxep.Message) error {
 		}
 	}
 	return nil
+}
+
+func (p *ParsedQuery) Cmd() string {
+	return p.cmd
+}
+
+func (p *ParsedQuery) Subcmd() string {
+	return p.subcmd
+}
+func (p *ParsedQuery) Key() string {
+	return p.key
+}
+
+func (p *ParsedQuery) Data() []string {
+	return p.data
 }
