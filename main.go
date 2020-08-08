@@ -1,8 +1,6 @@
 package main
 
-import (
-	"log"
-)
+import "log"
 
 func main() {
 
@@ -15,4 +13,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 }

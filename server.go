@@ -16,11 +16,13 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"net"
 	"time"
 
 	"github.com/thetinygoat/dictX/dxep"
+	"github.com/thetinygoat/dictX/handler"
 	"github.com/thetinygoat/dictX/parser"
 )
 
@@ -32,6 +34,7 @@ const (
 type Server struct {
 	listener net.Listener
 	timeout  time.Duration
+	handler  *handler.Handler
 }
 
 // InitServer initializes the Server struct
@@ -43,6 +46,7 @@ func InitServer(network, addr string, timeout time.Duration) (*Server, error) {
 	srv := &Server{}
 	srv.listener = ln
 	srv.timeout = timeout
+	srv.handler = handler.New()
 	return srv, nil
 }
 
@@ -69,6 +73,10 @@ func (srv *Server) read(conn net.Conn) {
 			log.Fatal(err)
 		}
 		arr, _ := msg.Array()
-		parser.Parse(arr)
+		p, err := parser.Parse(arr)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(srv.handler.Handle(p))
 	}
 }
