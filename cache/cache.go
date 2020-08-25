@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+// Package cache defines the interface that all the caches must implement
+package cache
 
-func main() {
-	srv, _ := NewServer("8080", 102400)
-	srv.Listen()
+// Cache is the default interface that all caches implement
+type Cache interface {
+	Get(key string) (string, bool)
+	Set(key, value string, ttl int64)
+	Contains(Key string) bool
+	Size() int64
+	Del(key string)
 }

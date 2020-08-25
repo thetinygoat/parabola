@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 
-// http://www.apache.org/licenses/LICENSE-2.0
+// 	http://www.apache.org/licenses/LICENSE-2.0
 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,59 +16,79 @@ package main
 
 import (
 	"bufio"
-	"log"
+	"io"
 	"net"
-	"time"
 
-	"github.com/thetinygoat/dictX/dxep"
-	"github.com/thetinygoat/dictX/parser"
+	"github.com/thetinygoat/DictX/lru"
+
+	"github.com/thetinygoat/DictX/parser"
+
+	"github.com/thetinygoat/DictX/protocol"
 )
 
-const (
-	bufSize = 4096
-)
-
-// Server describes dictX server
+// Server provides core server functionality
 type Server struct {
-	listener net.Listener
-	timeout  time.Duration
+	ln    net.Listener
+	port  string
+	cache *lru.Lru
 }
 
-// InitServer initializes the Server struct
-func InitServer(network, addr string, timeout time.Duration) (*Server, error) {
-	ln, err := net.Listen(network, addr)
+// NewServer instantiates a new tcp server
+func NewServer(port string, maxMemory int64) (*Server, error) {
+	ln, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		return nil, err
 	}
-	srv := &Server{}
-	srv.listener = ln
-	srv.timeout = timeout
-	return srv, nil
+	return &Server{ln: ln, port: port, cache: lru.New(maxMemory)}, nil
 }
 
-// Listen listens for new connections
+// Listen starts the server and listens for connections on the port
 func (srv *Server) Listen() error {
-	defer srv.listener.Close()
-
 	for {
-		conn, err := srv.listener.Accept()
+		conn, err := srv.ln.Accept()
 		if err != nil {
 			return err
 		}
-		go srv.read(conn)
+		go srv.handleConnection(conn)
 	}
 }
 
-func (srv *Server) read(conn net.Conn) {
+func (srv *Server) handleConnection(conn net.Conn) {
 	defer conn.Close()
+
 	for {
-		// conn.SetDeadline(time.Now().Add(time.Second * 30))
-		buf := bufio.NewReaderSize(conn, bufSize)
-		msg, err := dxep.Parse(buf)
-		if err != nil {
-			log.Fatal(err)
+		r := bufio.NewReader(conn)
+		m, err := protocol.Read(r)
+		if err != nil && err != io.EOF {
+			conn.Write([]byte(err.Error()))
+			return
 		}
-		arr, _ := msg.Array()
-		parser.Parse(arr)
+		qArr, err := m.Array()
+		if err != nil {
+			conn.Write([]byte(err.Error()))
+			return
+		}
+		q, err := parser.Parse(qArr)
+		if err != nil {
+			conn.Write([]byte(err.Error()))
+			return
+		}
+		switch q.Cmd {
+		case "GET":
+			res, ok := srv.cache.Get(q.Key)
+			if !ok {
+				conn.Write([]byte("nil\n"))
+			} else {
+				conn.Write([]byte(res + "\n"))
+			}
+		case "SET":
+			srv.cache.Set(q.Key, q.Value, q.TTL)
+			conn.Write([]byte("ok\n"))
+		case "DEL":
+			srv.cache.Del(q.Key)
+			conn.Write([]byte("ok\n"))
+		default:
+			conn.Write([]byte("no cmd\n"))
+		}
 	}
 }

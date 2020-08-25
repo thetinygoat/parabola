@@ -1,5 +1,3 @@
-module github.com/thetinygoat/dictX
+module github.com/thetinygoat/DictX
 
-go 1.14
-
-require github.com/emirpasic/gods v1.12.0
+go 1.15
