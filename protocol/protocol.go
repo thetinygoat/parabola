@@ -18,6 +18,7 @@ package protocol
 
 import (
 	"bufio"
+	"errors"
 	"io"
 	"strconv"
 )
@@ -42,6 +43,11 @@ var (
 var (
 	sep   = []byte{'\r', '\n'}
 	delim = sep[len(sep)-1]
+)
+
+var (
+	errParse       = errors.New("error parsing query")
+	errInvalidType = errors.New("invalid type")
 )
 
 // Message is the struct that contains the decoded/encoded data
@@ -139,22 +145,34 @@ func readError(r *bufio.Reader) (*Message, error) {
 }
 
 // Bytes returns underlying string
-func (m *Message) Bytes() []byte {
-	return m.v.([]byte)
+func (m *Message) Bytes() ([]byte, error) {
+	if v, ok := m.v.([]byte); ok {
+		return v, nil
+	}
+	return nil, errInvalidType
 }
 
 // String returns underlying string
-func (m *Message) String() string {
-	b := m.Bytes()
-	return string(b)
+func (m *Message) String() (string, error) {
+	b, err := m.Bytes()
+	if err != nil {
+		return "", nil
+	}
+	return string(b), nil
 }
 
 // Integer returns underlying integer(int64)
-func (m *Message) Integer() int64 {
-	return m.v.(int64)
+func (m *Message) Integer() (int64, error) {
+	if v, ok := m.v.(int64); ok {
+		return v, nil
+	}
+	return 0, errInvalidType
 }
 
 // Array returns underlying message slice
-func (m *Message) Array() []*Message {
-	return m.v.([]*Message)
+func (m *Message) Array() ([]*Message, error) {
+	if v, ok := m.v.([]*Message); ok {
+		return v, nil
+	}
+	return nil, errInvalidType
 }
