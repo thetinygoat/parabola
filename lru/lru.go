@@ -16,6 +16,7 @@
 package lru
 
 import (
+	"sync"
 	"time"
 )
 
@@ -30,6 +31,7 @@ type Lru struct {
 	head, tail              *node
 	keymap                  map[string]*node
 	size, maxMemory, memory int64
+	mu                      sync.Mutex
 }
 
 // New instantiates a new lru
@@ -48,6 +50,8 @@ func New(maxMemory int64) *Lru {
 
 // Set inserts a key-value pair in to the lru
 func (lru *Lru) Set(key, value string, ttl int64) {
+	lru.mu.Lock()
+	defer lru.mu.Unlock()
 	if lru.Contains(key) {
 		node := lru.keymap[key]
 		oldValue := node.value
@@ -82,6 +86,8 @@ func (lru *Lru) Set(key, value string, ttl int64) {
 
 // Get returns the value associated with a key
 func (lru *Lru) Get(key string) (string, bool) {
+	lru.mu.Lock()
+	defer lru.mu.Unlock()
 	if !lru.Contains(key) {
 		return "", false
 	}
@@ -107,6 +113,19 @@ func (lru *Lru) Contains(key string) bool {
 // Size returns the size of the lru
 func (lru *Lru) Size() int64 {
 	return lru.size
+}
+
+// Del removes the key from the cache
+func (lru *Lru) Del(key string) {
+	lru.mu.Lock()
+	defer lru.mu.Unlock()
+	if !lru.Contains(key) {
+		return
+	}
+	node := lru.keymap[key]
+	lru.remove(node)
+	lru.free(node.value)
+	delete(lru.keymap, key)
 }
 
 func (lru *Lru) isExpired(expireTime time.Time) bool {
