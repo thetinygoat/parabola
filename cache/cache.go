@@ -12,38 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+// Package cache defines the interface that all the caches must implement
+package cache
 
-import (
-	"bufio"
-	"fmt"
-	"io"
-	"net"
-
-	"github.com/thetinygoat/DictX/protocol"
-)
-
-func main() {
-	ln, err := net.Listen("tcp", ":9898")
-	if err != nil {
-		panic(err)
-	}
-	defer ln.Close()
-	conn, err := ln.Accept()
-	if err != nil {
-		panic(err)
-	}
-	for {
-		r := bufio.NewReader(conn)
-		msg, err := protocol.Read(r)
-		if err != nil && err != io.EOF {
-			conn.Close()
-			panic(err)
-		}
-		m := msg.Array()
-		for i := range m {
-			fmt.Println(m[i].String())
-		}
-	}
-
+// Cache is the default interface that all caches implement
+type Cache interface {
+	Get(key string) (string, bool)
+	Set(key, value string, ttl int64)
+	Contains(Key string) bool
+	Size() int64
 }

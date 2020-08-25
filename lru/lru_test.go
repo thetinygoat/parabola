@@ -12,38 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package lru
 
-import (
-	"bufio"
-	"fmt"
-	"io"
-	"net"
+import "testing"
 
-	"github.com/thetinygoat/DictX/protocol"
-)
-
-func main() {
-	ln, err := net.Listen("tcp", ":9898")
-	if err != nil {
-		panic(err)
+func TestSet(t *testing.T) {
+	l := New(200)
+	l.Set("key1", "value1", 20)
+	l.Set("key2", "value2", 30)
+	l.Set("key3", "value3", 40)
+	if _, found := l.keymap["key1"]; !found {
+		t.Errorf("failed for key1")
 	}
-	defer ln.Close()
-	conn, err := ln.Accept()
-	if err != nil {
-		panic(err)
+	if _, found := l.keymap["key2"]; !found {
+		t.Errorf("failed for key")
 	}
-	for {
-		r := bufio.NewReader(conn)
-		msg, err := protocol.Read(r)
-		if err != nil && err != io.EOF {
-			conn.Close()
-			panic(err)
-		}
-		m := msg.Array()
-		for i := range m {
-			fmt.Println(m[i].String())
-		}
+	if _, found := l.keymap["key3"]; !found {
+		t.Errorf("failed for key3")
 	}
-
+}
+func TestGet(t *testing.T) {
 }
