@@ -21,4 +21,5 @@ type Cache interface {
 	Set(key, value string, ttl int64)
 	Contains(Key string) bool
 	Size() int64
+	Del(key string)
 }
