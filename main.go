@@ -14,36 +14,7 @@
 
 package main
 
-import (
-	"bufio"
-	"fmt"
-	"io"
-	"net"
-
-	"github.com/thetinygoat/DictX/protocol"
-)
-
 func main() {
-	ln, err := net.Listen("tcp", ":9898")
-	if err != nil {
-		panic(err)
-	}
-	defer ln.Close()
-	conn, err := ln.Accept()
-	if err != nil {
-		panic(err)
-	}
-	for {
-		r := bufio.NewReader(conn)
-		msg, err := protocol.Read(r)
-		if err != nil && err != io.EOF {
-			conn.Close()
-			panic(err)
-		}
-		m := msg.Array()
-		for i := range m {
-			fmt.Println(m[i].String())
-		}
-	}
-
+	srv, _ := NewServer("8080", 102400)
+	srv.Listen()
 }
