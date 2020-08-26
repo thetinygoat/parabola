@@ -60,35 +60,35 @@ func (srv *Server) handleConnection(conn net.Conn) {
 		r := bufio.NewReader(conn)
 		m, err := protocol.Read(r)
 		if err != nil && err != io.EOF {
-			conn.Write([]byte(err.Error()))
+			conn.Write(protocol.EncodeErr(err.Error()))
 			return
 		}
 		qArr, err := m.Array()
 		if err != nil {
-			conn.Write([]byte(err.Error()))
+			conn.Write(protocol.EncodeErr(err.Error()))
 			return
 		}
 		q, err := parser.Parse(qArr)
 		if err != nil {
-			conn.Write([]byte(err.Error()))
+			conn.Write(protocol.EncodeErr(err.Error()))
 			return
 		}
 		switch q.Cmd {
 		case "GET":
 			res, ok := srv.cache.Get(q.Key)
 			if !ok {
-				conn.Write([]byte("nil\n"))
+				conn.Write(protocol.EncodeNil())
 			} else {
-				conn.Write([]byte(res + "\n"))
+				conn.Write(protocol.EncodeStr(res))
 			}
 		case "SET":
 			srv.cache.Set(q.Key, q.Value, q.TTL)
-			conn.Write([]byte("ok\n"))
+			conn.Write(protocol.EncodeStr("Ok"))
 		case "DEL":
 			srv.cache.Del(q.Key)
-			conn.Write([]byte("ok\n"))
+			conn.Write(protocol.EncodeStr("Ok"))
 		default:
-			conn.Write([]byte("no cmd\n"))
+			conn.Write(protocol.EncodeErr("Unsupported command"))
 		}
 	}
 }
