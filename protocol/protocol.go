@@ -48,6 +48,7 @@ var (
 var (
 	errParse       = errors.New("error parsing query")
 	errInvalidType = errors.New("invalid type")
+	errEncode      = errors.New("encoding error")
 )
 
 // Message is the struct that contains the decoded/encoded data
@@ -64,8 +65,8 @@ func Read(reader io.Reader) (*Message, error) {
 
 func read(r *bufio.Reader) (*Message, error) {
 	h, err := r.ReadByte()
-	if err != nil {
-		panic(err)
+	if err != nil && err != io.EOF {
+		return nil, err
 	}
 
 	switch h {
@@ -73,8 +74,14 @@ func read(r *bufio.Reader) (*Message, error) {
 		return readString(r)
 	case arrayPrefix:
 		return readArray(r)
+	case integerPrefix:
+		return readInteger(r)
+	case nilPrefix:
+		return readString(r)
+	case errorPrefix:
+		return readError(r)
 	default:
-		return nil, nil
+		return nil, errParse
 	}
 }
 
@@ -144,6 +151,11 @@ func readError(r *bufio.Reader) (*Message, error) {
 	return &Message{t: Error, v: buf[:len(buf)-2]}, nil
 }
 
+// Type returns type of the data
+func (m *Message) Type() int {
+	return m.t
+}
+
 // Bytes returns underlying string
 func (m *Message) Bytes() ([]byte, error) {
 	if v, ok := m.v.([]byte); ok {
@@ -175,4 +187,59 @@ func (m *Message) Array() ([]*Message, error) {
 		return v, nil
 	}
 	return nil, errInvalidType
+}
+
+// EncodeStr encodes the given data to a string
+func EncodeStr(data string) []byte {
+	var buf []byte
+	buf = append(buf, stringPrefix)
+	buf = strconv.AppendInt(buf, int64(len(data)), 10)
+	buf = append(buf, sep...)
+	buf = append(buf, data...)
+	buf = append(buf, sep...)
+
+	return buf
+}
+
+// EncodeErr encodes the given data to an error
+func EncodeErr(data string) []byte {
+	var buf []byte
+	buf = append(buf, errorPrefix)
+	buf = append(buf, data...)
+	buf = append(buf, sep...)
+
+	return buf
+}
+
+// EncodeInt encodes the given data to an int
+func EncodeInt(data int) []byte {
+	var buf []byte
+	buf = append(buf, integerPrefix)
+	buf = strconv.AppendInt(buf, int64(data), 10)
+	buf = append(buf, sep...)
+
+	return buf
+}
+
+// EncodeNil encodes data to nil
+func EncodeNil() []byte {
+	var buf []byte
+	buf = append(buf, nilPrefix)
+	buf = strconv.AppendInt(buf, int64(-1), 10)
+	buf = append(buf, sep...)
+
+	return buf
+}
+
+// EncodeArray encodes data to an array
+func EncodeArray(data []string) []byte {
+	var buf []byte
+	buf = append(buf, arrayPrefix)
+	buf = strconv.AppendInt(buf, int64(len(data)), 10)
+	buf = append(buf, sep...)
+	for i := range data {
+		buf = append(buf, EncodeStr(data[i])...)
+	}
+
+	return buf
 }
