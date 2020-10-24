@@ -1,3 +1,7 @@
+# This project has been moved
+This project is being **re-written** and has been moved to [https://github.com/parabola-dev/parabola](https://github.com/parabola-dev/parabola)
+
+# Index
 - [What is Parabola](#what-is-parabola)
 - [Motivation](#motivation)
 - [How it works](#how-it-works)
