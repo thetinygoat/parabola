@@ -1,5 +1,5 @@
 ![Alt Text](https://dev-to-uploads.s3.amazonaws.com/i/oqv75du95c2tr143p5l1.png)
-- [What is DictX](#what-is-dictx)
+- [What is Parabola](#what-is-parabola)
 - [Motivation](#motivation)
 - [How it works](#how-it-works)
 - [Installation](#installation)
@@ -7,19 +7,19 @@
 - [Usage](#usage)
   - [Starting the server](#starting-the-server)
   - [Interacting with the server](#interacting-with-the-server)
-  -	[Using dictx-cli](#using-dictx-cli)
-- [DictX commands](#dictx-commands)
+  -	[Using parabola-cli](#using-parabola-cli)
+- [Parabola commands](#parabola-commands)
   - [set](#set)
   - [get](#get)
   - [del](#del)
-- [DictX protocol](#dictx-protocol)
+- [Parabola protocol](#parabola-protocol)
 
-# What is DictX?
-DictX is an in-memory data store, currently it can be used as a database cache. In future, I plan to add support for more data structures, but until it matures and all the bugs are ironed out, i plan to keep it simple.
+# What is Parabola?
+Parabola is an in-memory data store, currently it can be used as a database cache. In future, I plan to add support for more data structures, but until it matures and all the bugs are ironed out, i plan to keep it simple.
 # Motivation
-My plan for writing DictX is not to overthrow industry standards like redis and memcached, I don't want to and can't compete with them. My motivation for writing DictX is to provide a simple solution for all the caching needs of small to medium sized apps, which previously may not have considered the existing options due to the complexity or other problems.
+My plan for writing Parabola is not to overthrow industry standards like redis and memcached, I don't want to and can't compete with them. My motivation for writing Parabola is to provide a simple solution for all the caching needs of small to medium sized apps, which previously may not have considered the existing options due to the complexity or other problems.
 # How it works?
-At it's core, DictX is just a server which operates on TCP. Currently it supports key-value caching, with LRU eviction policy. DictX uses a custom communication protocol for the client-server communication. If you wish to read more about the implementation details feel free to read ahead.
+At it's core, Parabola is just a server which operates on TCP. Currently it supports key-value caching, with LRU eviction policy. Parabola uses a custom communication protocol for the client-server communication. If you wish to read more about the implementation details feel free to read ahead.
 
 # Installation
 You can download the latest release from the releases page.
@@ -31,23 +31,23 @@ You can download the latest release from the releases page.
 
 # Usage
 ## Starting the server
-The DictX server takes two optional flags.
-- `port` is the port on which DictX runs, by default it is `9898`, you can use any available port.
-- `mem` is the max memory available to DictX server in `bytes`, by default it's `1GB`. It's just a limit for the DictX server and does not affect the performance of your system.
+The Parabola server takes two optional flags.
+- `port` is the port on which Parabola runs, by default it is `9898`, you can use any available port.
+- `mem` is the max memory available to Parabola server in `bytes`, by default it's `1GB`. It's just a limit for the Parabola server and does not affect the performance of your system.
 Example:
 ```bash
-$ dictx -port=9000 -mem=1073741824
+$ parabola -port=9000 -mem=1073741824
 ```
 ## Interacting with the server
-Though you can use traditional tools like `telnet` or `ncat` to interact with the server, it requires knowledge about the DictX protocol and it's pretty easy to mess up and might result in undesireable behaviour. I suggest using the `dictx-cli` to interact with the DictX server which takes care of all the encoding and decoding.
-## Using `dictx-cli`
-`dictx-cli` takes one optional flag, that is the port that DictX server is running on.
+Though you can use traditional tools like `telnet` or `ncat` to interact with the server, it requires knowledge about the Parabola protocol and it's pretty easy to mess up and might result in undesireable behaviour. I suggest using the `parabola-cli` to interact with the Parabola server which takes care of all the encoding and decoding.
+## Using `parabola-cli`
+`parabola-cli` takes one optional flag, that is the port that Parabola server is running on.
 Example:
 ```bash
-$ dictx-cli -port=9000
+$ parabola-cli -port=9000
 ```
 
-# DictX commands
+# Parabola commands
 Currently there are 3 basic commands
 - `set` which inserts a key-value pair with a ttl.
 - `get` to retrieve the value of a specified key.
@@ -91,8 +91,8 @@ Example:
 ```
 This will delete the key from the key space.
 
-# DictX protocol
-The DictX protocol is a modified version of RESP.
+# Parabola protocol
+The Parabola protocol is a modified version of RESP.
 There are 5 data types
 - Strings
 - Integers
@@ -109,7 +109,7 @@ The first byte of the message contains the data type of the message. Following a
 
 CRLF is used as a delimiter.
 ## Strings
-All the strings in DictX are binary safe, unlike RESP, DictX protocol does not allow unsafe strings. 
+All the strings in Parabola are binary safe, unlike RESP, Parabola protocol does not allow unsafe strings. 
 The length of the string is embedded within the message.
 Example:
 `thetinygoat` will be encoded as
@@ -131,7 +131,7 @@ Example:
 Where `%` is the specifier, `1000` is the encoded number followed by a CRLF.
 
 ## Arrays
-Arrays are specified with `#` they can contain data of any of the other four types. DictX protocol does not support nested arrays and `Nil` arrays.
+Arrays are specified with `#` they can contain data of any of the other four types. Parabola protocol does not support nested arrays and `Nil` arrays.
 Example:
 ```
 #2
