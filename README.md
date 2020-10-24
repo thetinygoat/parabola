@@ -1,5 +1,5 @@
 # This project has been moved
-This project is being **re-written** and has been moved to [https://github.com/parabola-dev/parabola](https://github.com/parabola-dev/parabola)
+This project is being **re-written** and has been moved to [https://github.com/parabola-labs/parabola](https://github.com/parabola-labs/parabola)
 
 # Index
 - [What is Parabola](#what-is-parabola)
