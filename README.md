@@ -1,4 +1,3 @@
-![Alt Text](https://dev-to-uploads.s3.amazonaws.com/i/oqv75du95c2tr143p5l1.png)
 - [What is Parabola](#what-is-parabola)
 - [Motivation](#motivation)
 - [How it works](#how-it-works)
