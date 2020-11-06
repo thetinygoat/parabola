@@ -1,7 +1,4 @@
-# This project has been moved
-This project is being **re-written** and has been moved to [https://github.com/parabola-labs/parabola](https://github.com/parabola-labs/parabola)
-
-# Index
+# List of contents
 - [What is Parabola](#what-is-parabola)
 - [Motivation](#motivation)
 - [How it works](#how-it-works)
